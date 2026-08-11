@@ -37,3 +37,12 @@ export const Ico = ({ n, s = 16 }) => (
 export const F = ({ l, h, children }) => (
   <label className="cp-fld"><span className="l">{l}</span>{children}{h && <span className="h">{h}</span>}</label>
 );
+
+/* segmented chip selector */
+export const Chips = ({ opts, v, on }) => (
+  <div className="cp-chips">
+    {opts.map(([k, l]) => (
+      <button key={k} type="button" className={"cp-chip" + (v === k ? " on" : "")} onClick={() => on(k)}>{l}</button>
+    ))}
+  </div>
+);

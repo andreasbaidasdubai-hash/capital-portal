@@ -5,6 +5,7 @@ import Positions from "./Positions.jsx";
 import Cashflow from "./Cashflow.jsx";
 import Liquidity from "./Liquidity.jsx";
 import Admin from "./Admin.jsx";
+import Sheet from "./Sheet.jsx";
 
 export const TABS = ["Overview", "Positions", "Cashflow", "Liquidity", "Admin"];
 
@@ -12,8 +13,18 @@ export const TABS = ["Overview", "Positions", "Cashflow", "Liquidity", "Admin"];
    Used by App (wrapped in the vault gate) and by the seed-data preview. */
 export default function Portal({
   s, e, view, setView, role, mode, setMode, setBase, lock,
-  edit, onEdit, onAdd, err, flash, setFlash, admin,
+  edit, err, flash, setFlash, admin,
+  sheet, openSheet, closeSheet, save, saveMany, del, ratesSave,
 }) {
+  const addPos = () => openSheet({ t: "position" });
+  const editPos = (p) => openSheet({ t: "position", item: s.positions.find((x) => x.id === p.id) || p });
+  const addCommit = () => openSheet({ t: "commitment" });
+  const addInflow = () => openSheet({ t: "inflow" });
+  const editRates = () => openSheet({ t: "rates" });
+  const editOutgoing = (o) => {
+    if (o.src === "commitment" && o.raw) openSheet({ t: "commitment", item: o.raw });
+    else if (o.posId) { const p = s.positions.find((x) => x.id === o.posId); if (p) openSheet({ t: "position", item: p }); }
+  };
   return (
     <div className="cp">
       <header className="cp-hdr">
@@ -57,16 +68,18 @@ export default function Portal({
 
       <main className="cp-main">
         {view === "Overview" && <Overview e={e} s={s} setView={setView} />}
-        {view === "Positions" && <Positions e={e} s={s} edit={edit} onAdd={onAdd} onEdit={onEdit} />}
-        {view === "Cashflow" && <Cashflow e={e} s={s} />}
+        {view === "Positions" && <Positions e={e} s={s} edit={edit} onAdd={addPos} onEdit={editPos} />}
+        {view === "Cashflow" && <Cashflow e={e} s={s} edit={edit} onAddCommit={addCommit} onAddInflow={addInflow} onEdit={editOutgoing} />}
         {view === "Liquidity" && <Liquidity e={e} s={s} />}
-        {view === "Admin" && <Admin s={s} role={role} {...admin} />}
+        {view === "Admin" && <Admin s={s} role={role} {...admin} onEditRates={editRates} />}
       </main>
 
       <footer className="cp-foot">
         <span>Capital Portal · encrypted, held on this device only</span>
         <span>{e.priced.length} positions · base {s.base}</span>
       </footer>
+
+      {sheet && <Sheet sheet={sheet} s={s} close={closeSheet} save={save} saveMany={saveMany} del={del} rates={ratesSave} />}
     </div>
   );
 }

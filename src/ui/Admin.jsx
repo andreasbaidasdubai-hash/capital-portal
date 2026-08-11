@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Ico, F } from "./common.jsx";
 import { num } from "../engine/format.js";
 
-export default function Admin({ s, role, hasViewer, setSlot, lock, onBackup, onRestore, onRates2, rateMsg, onAuto, onWipe, onSeed }) {
+export default function Admin({ s, role, hasViewer, setSlot, lock, onBackup, onRestore, onRates2, rateMsg, onAuto, onWipe, onSeed, onEditRates }) {
   const backupAt = s.backupAt;
   const staleBackup = !backupAt || (Date.now() - Date.parse(backupAt)) > 7 * 864e5;
   const [pane, setPane] = useState(null);
@@ -97,7 +97,12 @@ export default function Admin({ s, role, hasViewer, setSlot, lock, onBackup, onR
       <section className="cp-panel" style={{ marginTop: 24 }}>
         <div className="cp-section-h" style={{ marginBottom: 12 }}>
           <span className="eyebrow">Exchange rates — value of one unit in {s.base}</span>
-          {role === "owner" && <button className="cp-btn ghost sm" onClick={onRates2}><Ico n="refresh" s={13} />Refresh now</button>}
+          {role === "owner" && (
+            <div style={{ display: "flex", gap: 8 }}>
+              {onEditRates && <button className="cp-btn ghost sm" onClick={onEditRates}><Ico n="key" s={13} />Enter manually</button>}
+              <button className="cp-btn ghost sm" onClick={onRates2}><Ico n="refresh" s={13} />Refresh now</button>
+            </div>
+          )}
         </div>
         <table className="cp-mini"><tbody>
           {["USD", "AED", "EUR", "CHF"].map((c) => (

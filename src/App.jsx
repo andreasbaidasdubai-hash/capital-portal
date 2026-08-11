@@ -20,6 +20,7 @@ export default function App() {
   const [flash, setFlash] = useState("");
   const [view, setView] = useState("Overview");
   const [mode, setMode] = useState("edit");
+  const [sheet, setSheet] = useState(null);
 
   const [vault, setVault] = useState(null);
   const [gate, setGate] = useState("boot"); // boot | setup | unlock | open
@@ -55,7 +56,7 @@ export default function App() {
   const up = useCallback((fn) => setS((c) => { const n = fn(c); ref.current(n); return n; }), []);
 
   const lock = useCallback(() => {
-    dk.current = null; setS(BLANK); setGate("unlock"); setView("Overview"); setMode("edit");
+    dk.current = null; setS(BLANK); setSheet(null); setGate("unlock"); setView("Overview"); setMode("edit");
   }, []);
 
   useEffect(() => {
@@ -133,7 +134,13 @@ export default function App() {
 
   const e = useEngine(s, ZERO, 60);
   const edit = mode === "edit" && role === "owner";
-  const notEditable = () => setFlash("The in-place editor is the next piece to build. For now: load the sample book or restore your encrypted backup from Admin.");
+
+  const upsert = (b, item) => up((c) => {
+    const l = c[b] || [], i = l.findIndex((x) => x.id === item.id);
+    return { ...c, [b]: i >= 0 ? l.map((x) => (x.id === item.id ? item : x)) : [...l, item] };
+  });
+  const drop = (b, id) => up((c) => ({ ...c, [b]: (c[b] || []).filter((x) => x.id !== id) }));
+  const saveMany = (b, arr) => up((c) => ({ ...c, [b]: [...(c[b] || []), ...arr] }));
 
   if (!ready) return <div className="cp"><div className="cp-gate-wrap"><div className="eyebrow">Opening vault…</div></div></div>;
   if (!subtle) return (
@@ -149,7 +156,12 @@ export default function App() {
     <Portal
       s={s} e={e} view={view} setView={setView} role={role} mode={mode} setMode={setMode}
       setBase={(c) => up((x) => ({ ...x, base: c }))} lock={lock} edit={edit}
-      onAdd={notEditable} onEdit={notEditable} err={err} flash={flash} setFlash={setFlash}
+      err={err} flash={flash} setFlash={setFlash}
+      sheet={sheet} openSheet={setSheet} closeSheet={() => setSheet(null)}
+      save={(b, i) => { upsert(b, i); setSheet(null); }}
+      saveMany={(b, arr) => { saveMany(b, arr); setSheet(null); }}
+      del={(b, id) => { drop(b, id); setSheet(null); }}
+      ratesSave={(p) => { up((c) => ({ ...c, ...p })); setSheet(null); }}
       admin={{
         hasViewer: !!vault?.slots?.viewer, setSlot, lock,
         onBackup, onRestore, onRates2: () => refreshRates(true), rateMsg,

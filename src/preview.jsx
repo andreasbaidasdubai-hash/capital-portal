@@ -16,14 +16,28 @@ function Preview() {
   const [view, setView] = useState("Overview");
   const [mode, setMode] = useState("edit");
   const [flash, setFlash] = useState("");
+  const [sheet, setSheet] = useState(null);
   const e = computeEngine(s, ZERO, 60);
-  const noop = () => setFlash("Preview mode — editing and vault actions are disabled here.");
+  const noop = () => setFlash("Preview mode — vault actions are disabled here.");
+
+  const upsert = (b, item) => setS((c) => {
+    const l = c[b] || [], i = l.findIndex((x) => x.id === item.id);
+    return { ...c, [b]: i >= 0 ? l.map((x) => (x.id === item.id ? item : x)) : [...l, item] };
+  });
+  const drop = (b, id) => setS((c) => ({ ...c, [b]: (c[b] || []).filter((x) => x.id !== id) }));
+  const saveMany = (b, arr) => setS((c) => ({ ...c, [b]: [...(c[b] || []), ...arr] }));
+
   return (
     <Portal
       s={s} e={e} view={view} setView={setView} role="owner" mode={mode} setMode={setMode}
       setBase={(c) => setS((x) => ({ ...x, base: c }))} lock={noop} edit={mode === "edit"}
-      onAdd={noop} onEdit={noop} err="" flash={flash} setFlash={setFlash}
-      admin={{ hasViewer: false, setSlot: noop, lock: noop, onBackup: noop, onRestore: noop, onRates2: noop, rateMsg: "", onAuto: noop, onWipe: noop, onSeed: noop }}
+      err="" flash={flash} setFlash={setFlash}
+      sheet={sheet} openSheet={setSheet} closeSheet={() => setSheet(null)}
+      save={(b, i) => { upsert(b, i); setSheet(null); }}
+      saveMany={(b, arr) => { saveMany(b, arr); setSheet(null); }}
+      del={(b, id) => { drop(b, id); setSheet(null); }}
+      ratesSave={(p) => { setS((c) => ({ ...c, ...p })); setSheet(null); }}
+      admin={{ hasViewer: false, setSlot: noop, lock: noop, onBackup: noop, onRestore: noop, onRates2: noop, rateMsg: "", onAuto: noop, onWipe: noop, onSeed: () => setS(buildSeedState()) }}
     />
   );
 }

@@ -6,7 +6,7 @@ const mDate = (key) => { const [y, m] = key.split("-"); return `${MON[Number(m) 
 const shortDay = (iso) => (iso ? `${MON[Number(iso.slice(5, 7)) - 1]} ${iso.slice(8, 10)}, ${iso.slice(2, 4)}` : "—");
 const cleanLabel = (s) => s.replace(/ — (realised|completes)$/, "");
 
-export default function Cashflow({ e, s }) {
+export default function Cashflow({ e, s, edit, onAddCommit, onAddInflow, onEdit }) {
   const [tab, setTab] = useState("out");
   const t0 = today();
   const out = e.outgoings
@@ -18,9 +18,13 @@ export default function Cashflow({ e, s }) {
     <>
       <div className="cp-section-h" style={{ marginTop: 4 }}>
         <h2>Cashflow</h2>
-        <div className="cp-lens">
-          <button className={tab === "out" ? "on" : ""} onClick={() => setTab("out")}>Outgoings</button>
-          <button className={tab === "in" ? "on" : ""} onClick={() => setTab("in")}>Realisations</button>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {edit && <button className="cp-btn ghost sm" onClick={onAddCommit}>+ Commitment</button>}
+          {edit && <button className="cp-btn ghost sm" onClick={onAddInflow}>+ Income</button>}
+          <div className="cp-lens">
+            <button className={tab === "out" ? "on" : ""} onClick={() => setTab("out")}>Outgoings</button>
+            <button className={tab === "in" ? "on" : ""} onClick={() => setTab("in")}>Realisations</button>
+          </div>
         </div>
       </div>
 
@@ -40,7 +44,7 @@ export default function Cashflow({ e, s }) {
               <thead><tr><th>Due</th><th>Item</th><th>Counterparty</th><th className="r">Amount</th></tr></thead>
               <tbody>
                 {out.map((o) => (
-                  <tr key={o.id}>
+                  <tr key={o.id} onClick={() => edit && onEdit && onEdit(o)} style={{ cursor: edit ? "pointer" : "default" }}>
                     <td className="num" style={{ whiteSpace: "nowrap" }}>{shortDay(o.due)}</td>
                     <td><span className="name">{o.posName ? o.posName : o.label}</span>{o.posName && <div className="place">{o.label}</div>}</td>
                     <td style={{ color: "var(--body)", fontSize: 12.5 }}>{o.counterparty || "—"}</td>
