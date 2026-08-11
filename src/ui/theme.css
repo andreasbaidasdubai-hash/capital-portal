@@ -73,10 +73,7 @@
   max-width: var(--maxw); margin: 0 auto;
   padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px;
 }
-.cp-brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
-.cp-brand svg { width: 26px; height: 26px; flex: 0 0 26px; }
-.cp-brand-t { font-family: var(--serif); font-weight: 500; font-size: 21px; letter-spacing: 0.01em; color: var(--ink); white-space: nowrap; }
-.cp-brand-sub { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); margin-top: 1px; }
+.cp-brand { display: flex; align-items: center; min-width: 0; }
 .cp-hdr-r { display: flex; align-items: center; gap: 14px; }
 .cp-asof { font-family: var(--mono); font-size: 11px; color: var(--soft); }
 .cp-lock {
@@ -233,9 +230,7 @@
 .cp-gate-wrap { min-height: 100vh; display: grid; place-items: center; padding: 40px 20px; background: var(--bg); }
 .cp-gate { width: 100%; max-width: 460px; }
 .cp-gate.narrow { max-width: 380px; }
-.cp-gate .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; }
-.cp-gate .brand svg { width: 30px; height: 30px; }
-.cp-gate .brand span { font-family: var(--serif); font-size: 20px; font-weight: 500; }
+.cp-gate .brand { display: flex; align-items: center; margin-bottom: 32px; }
 .cp-gate h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(30px, 5vw, 40px); color: var(--ink); margin: 0 0 14px; letter-spacing: 0.005em; }
 .cp-gate .gp { font-size: 14.5px; line-height: 1.65; color: var(--body); margin: 0 0 26px; max-width: 52ch; }
 .cp-warn { display: flex; gap: 8px; font-size: 12.5px; color: var(--down); margin: -6px 0 14px; }
@@ -294,6 +289,22 @@
   .cp-cols { grid-template-columns: 1fr; gap: 32px; }
   .cp-lens { margin-left: 0; }
 }
+
+/* ── sort / controls ────────────────────────────────── */
+.cp-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: -8px 0 20px; }
+.cp-select { font-family: var(--sans); font-size: 12.5px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); cursor: pointer; }
+.cp-select:focus { outline: none; border-color: var(--navy); }
+.cp-th-sort { cursor: pointer; user-select: none; white-space: nowrap; }
+.cp-th-sort:hover { color: var(--body); }
+.cp-th-sort.act { color: var(--ink); }
+.cp-ar { font-size: 8px; margin-left: 3px; vertical-align: 1px; }
+.cp-tbl tfoot td { border-top: 2px solid var(--line); border-bottom: 0 !important; padding-top: 13px; font-weight: 700; }
+.cp-tbl tfoot td.tl { font-family: var(--sans); font-size: 10.5px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); }
+.cp-totcard { border: 1px solid var(--line); border-radius: 6px; padding: 14px 15px; background: var(--cream); margin-top: 4px; }
+.cp-totcard .th { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--soft); margin-bottom: 10px; }
+.cp-totrow { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; font-size: 13px; }
+.cp-totrow .k { color: var(--body); }
+.cp-totrow .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); }
 
 /* ── editor sheet ───────────────────────────────────── */
 .cp-scrim { position: fixed; inset: 0; z-index: 50; background: rgba(14,27,42,0.28); backdrop-filter: blur(2px); display: flex; justify-content: center; align-items: flex-end; }

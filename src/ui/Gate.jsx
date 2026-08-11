@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Monogram, Ico, F } from "./common.jsx";
+import { LogoLockup, Ico, F } from "./common.jsx";
 
 export function Setup({ onGo, legacy }) {
   const [a, setA] = useState(""); const [b, setB] = useState("");
@@ -18,7 +18,7 @@ export function Setup({ onGo, legacy }) {
   return (
     <div className="cp">
       <div className="cp-gate-wrap"><div className="cp-gate">
-        <div className="brand"><Monogram size={30} /><span>Capital Portal</span></div>
+        <div className="brand"><LogoLockup iconSize={30} fontSize={20} /></div>
         <h1>Set a passphrase.</h1>
         <p className="gp">Your ledger is encrypted with it before anything is stored. Nobody can read the vault without it — including me, and including anyone who gets at the stored file.</p>
 
@@ -71,7 +71,7 @@ export function Unlock({ onGo, hasViewer }) {
   return (
     <div className="cp">
       <div className="cp-gate-wrap"><div className="cp-gate narrow">
-        <div className="brand"><Monogram size={30} /><span>Capital Portal</span></div>
+        <div className="brand"><LogoLockup iconSize={30} fontSize={20} /></div>
         <h1>Locked.</h1>
         <p className="gp">Enter your passphrase to decrypt the ledger.{hasViewer && " The view-only passphrase works here too."}</p>
         <F l="Passphrase">

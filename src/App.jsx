@@ -132,6 +132,22 @@ export default function App() {
     return () => clearTimeout(t);
   }, [gate, role, s.autoRates, s.ratesAt, refreshRates]);
 
+  /* One-time migration (HANDOVER known item): positions saved before v36 may
+     carry a stale 2% acquisition/exit fee on cash, trading or crypto, where it
+     is meaningless. Clear it once, then remember we did. Real-estate keeps its
+     exit cost — agent commission on a property sale is real. */
+  useEffect(() => {
+    if (gate !== "open" || role !== "owner" || s.feesMigrated) return;
+    up((c) => ({
+      ...c,
+      feesMigrated: true,
+      positions: (c.positions || []).map((p) =>
+        (p.cls === "cash" || p.cls === "trading" || p.cls === "crypto")
+          ? { ...p, exitPct: 0, feePct: 0 }
+          : p),
+    }));
+  }, [gate, role, s.feesMigrated, up]);
+
   const e = useEngine(s, ZERO, 60);
   const edit = mode === "edit" && role === "owner";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Monogram, Ico } from "./common.jsx";
+import { LogoLockup, Ico } from "./common.jsx";
 import Overview from "./Overview.jsx";
 import Positions from "./Positions.jsx";
 import Cashflow from "./Cashflow.jsx";
@@ -30,11 +30,7 @@ export default function Portal({
       <header className="cp-hdr">
         <div className="cp-hdr-in">
           <div className="cp-brand">
-            <Monogram size={26} />
-            <div>
-              <div className="cp-brand-t">Capital Portal</div>
-              <div className="cp-brand-sub">Baidas &amp; Baidas — Private</div>
-            </div>
+            <LogoLockup iconSize={27} fontSize={19} />
           </div>
           <div className="cp-hdr-r">
             <div className="cp-pill" role="group" aria-label="Reporting currency">
@@ -75,7 +71,7 @@ export default function Portal({
       </main>
 
       <footer className="cp-foot">
-        <span>Capital Portal · encrypted, held on this device only</span>
+        <span>Encrypted · held on this device only</span>
         <span>{e.priced.length} positions · base {s.base}</span>
       </footer>
 
