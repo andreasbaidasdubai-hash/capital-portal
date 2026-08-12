@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Ico, F, Chips } from "./common.jsx";
 import { CLS, CLS_ORDER, CCY, CCY_DIGITAL, MARKETS } from "../engine/constants.js";
-import { uid, today, addMonths, sortTranches, num, sgn, pct, grow } from "../engine/format.js";
+import { uid, today, addMonths, monthsBetween, sortTranches, num, sgn, pct, grow } from "../engine/format.js";
 
 const Mrow = ({ l, v, tone, strong }) => (
   <tr><td className="k">{l}</td><td className="v" style={strong ? { fontWeight: 700 } : null}><span className={tone || ""}>{v}</span></td></tr>
@@ -41,7 +41,18 @@ export default function Sheet({ sheet, s, close, save, saveMany, del, rates }) {
   const rentPaLive = (Number(f.rentAmt) || 0) * ((Number(f.occ ?? 100)) / 100) * (12 / Math.max(1, Number(f.rentFreq) || 1));
   const servicePaLive = (Number(f.debt) || 0) * (((Number(f.rate) || 0) + (Number(f.amortPct) || 0)) / 100);
   const netPa = rentPaLive - servicePaLive;
-  const sellGrossLive = Number(f.sellGross) || Number(f.completeValue) || Number(f.value) || 0;
+  // Default sale price = the mark at the SALE date (matches the engine): grow
+  // the current value forward; only reach the completion value once the sale is
+  // at/after completion. Selling early therefore fetches less than completion value.
+  const gLive = f.cls === "cash" ? 0 : (Number(f.growth) || 0);
+  const mToSaleLive = f.sellDate ? Math.max(0, monthsBetween(today(), f.sellDate)) : 0;
+  const mToCompLive = f.completeDate ? Math.max(0, monthsBetween(today(), f.completeDate)) : 0;
+  const curMarkLive = Number(f.value) || Number(f.price) || 0;
+  const compValLive = Number(f.completeValue) || 0;
+  const markAtSale = (compValLive && mToSaleLive >= mToCompLive)
+    ? grow(compValLive, gLive, mToSaleLive - mToCompLive)
+    : grow(curMarkLive, gLive, mToSaleLive);
+  const sellGrossLive = Number(f.sellGross) || markAtSale;
   const sellNetLive = sellGrossLive * (1 - (Number(f.exitPct) || 0) / 100) - (Number(f.debt) || 0);
   const downAmtLive = Number(f.downAmt) || 0;
   const downPaidLive = f.downStatus === "due" ? 0 : downAmtLive;
