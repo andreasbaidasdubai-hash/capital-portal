@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { LogoLockup, Ico, F } from "./common.jsx";
 
-export function Setup({ onGo, legacy }) {
+export function Setup({ onGo, legacy, onRestore }) {
   const [a, setA] = useState(""); const [b, setB] = useState("");
   const [useViewer, setUseViewer] = useState(false); const [vp, setVp] = useState("");
   const [imp, setImp] = useState(!!legacy);
@@ -55,6 +55,19 @@ export function Setup({ onGo, legacy }) {
         <button className="cp-btn primary full" disabled={!ok || busy} onClick={go}>
           {busy ? "Encrypting…" : "Create encrypted vault"}
         </button>
+
+        {onRestore && (
+          <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
+            <span className="l" style={{ display: "block", fontSize: 10.5, fontWeight: 500, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--soft)", marginBottom: 8 }}>Already have a vault?</span>
+            <p style={{ margin: "0 0 12px", fontSize: 13, lineHeight: 1.55, color: "var(--body)" }}>
+              Your ledger is stored encrypted on each device on its own — it does not sync. If you've used the portal before, or you're on a new device, restore your backup here to bring it onto this one, then unlock with your usual passphrase.
+            </p>
+            <label className="cp-btn ghost full cp-filebtn">
+              <Ico n="layers" s={14} />Restore from a backup file
+              <input type="file" accept=".json,application/json" onChange={onRestore} />
+            </label>
+          </div>
+        )}
       </div></div>
     </div>
   );

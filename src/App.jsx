@@ -165,7 +165,7 @@ export default function App() {
       <p className="gp">This browser is not exposing the Web Crypto API, so the ledger cannot be encrypted. Open the app in Chrome, Safari or Firefox over https and it will work.</p>
     </div></div></div>
   );
-  if (gate === "setup") return <Setup onGo={doSetup} legacy={legacy} />;
+  if (gate === "setup") return <Setup onGo={doSetup} legacy={legacy} onRestore={onRestore} />;
   if (gate === "unlock") return <Unlock onGo={doUnlock} hasViewer={!!vault?.slots?.viewer} />;
 
   return (

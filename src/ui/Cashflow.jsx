@@ -54,6 +54,19 @@ export default function Cashflow({ e, s, edit, onAddCommit, onAddInflow, onEdit 
               </tbody>
             </table>
           </div>
+          <div className="cp-cardlist">
+            {out.map((o) => (
+              <div className="cp-dcard tap" key={o.id} onClick={() => edit && onEdit && onEdit(o)}>
+                <div className="cp-dcard-h">
+                  <div>
+                    <div className="cp-dcard-t">{o.posName ? o.posName : o.label}</div>
+                    <div className="cp-dcard-sub">{shortDay(o.due)}{o.posName ? ` · ${o.label}` : ""}{o.counterparty && o.counterparty !== "—" ? ` · ${o.counterparty}` : ""}</div>
+                  </div>
+                  <div className="cp-dcard-v">{num(Math.round(o.base))}</div>
+                </div>
+              </div>
+            ))}
+          </div>
           {out.length === 0 && <p className="cp-fine">Nothing scheduled ahead.</p>}
         </section>
       )}
@@ -75,6 +88,19 @@ export default function Cashflow({ e, s, edit, onAddCommit, onAddInflow, onEdit 
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="cp-cardlist">
+            {sells.map((m, i) => (
+              <div className="cp-dcard" key={i}>
+                <div className="cp-dcard-h">
+                  <div>
+                    <div className="cp-dcard-t">{cleanLabel(m.label)}</div>
+                    <div className="cp-dcard-sub">{mDate(m.key)}{m.profit != null ? ` · profit ${num(Math.round(m.profit))}` : ""}</div>
+                  </div>
+                  <div className="cp-dcard-v up">{num(Math.round(m.amt))}</div>
+                </div>
+              </div>
+            ))}
           </div>
           {sells.length === 0 && <p className="cp-fine">No planned realisations in the current book.</p>}
         </section>

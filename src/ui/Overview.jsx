@@ -130,6 +130,20 @@ export default function Overview({ e, s, setView }) {
               </tbody>
             </table>
           </div>
+          <div className="cp-cardlist">
+            {top.map((p) => (
+              <div className="cp-dcard" key={p.name}>
+                <div className="cp-dcard-h">
+                  <div><div className="cp-dcard-t">{p.name}</div><div className="cp-dcard-sub">{p.place}</div></div>
+                  <div className="cp-dcard-v up">{num(Math.round(p.profit))}</div>
+                </div>
+                <div className="cp-dcard-rows">
+                  <div className="cp-dcard-kv"><span className="k">Capital in</span><span className="v">{num(p.equity)}</span></div>
+                  <div className="cp-dcard-kv"><span className="k">Multiple</span><span className="v">{p.mult != null ? p.mult.toFixed(2) + "×" : "—"}</span></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
       )}
     </>

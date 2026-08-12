@@ -375,6 +375,36 @@
   .cp-trrow .td { grid-column: 2 / 4; }
 }
 
+/* ── generic data cards (table → cards on mobile) ───── */
+.cp-cardlist { display: none; flex-direction: column; gap: 9px; }
+.cp-dcard { border: 1px solid var(--line); border-radius: 8px; padding: 13px 14px; }
+.cp-dcard.tap { cursor: pointer; }
+.cp-dcard-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.cp-dcard-t { font-size: 14px; font-weight: 500; color: var(--ink); }
+.cp-dcard-sub { font-size: 11.5px; color: var(--soft); margin-top: 2px; }
+.cp-dcard-v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 14px; white-space: nowrap; }
+.cp-dcard-rows { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 9px; }
+.cp-dcard-kv { display: flex; flex-direction: column; gap: 1px; }
+.cp-dcard-kv .k { font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--soft); }
+.cp-dcard-kv .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 13px; color: var(--ink); }
+
+/* ── mobile: bigger touch targets, roomier controls ─── */
+@media (max-width: 720px) {
+  .cp-cardlist { display: flex; }
+  .cp-tab { padding: 14px 13px 13px; font-size: 13.5px; }
+  .cp-chip { padding: 9px 15px; font-size: 12.5px; }
+  .cp-lens { width: 100%; overflow-x: auto; scrollbar-width: none; }
+  .cp-lens::-webkit-scrollbar { display: none; }
+  .cp-lens button { padding: 11px 15px; white-space: nowrap; font-size: 12.5px; }
+  .cp-select { padding: 11px 12px; font-size: 13.5px; flex: 1; min-width: 0; }
+  .cp-controls { gap: 8px; }
+  .cp-pill-b { padding: 7px 13px; }
+  .cp-icon-btn { width: 36px; height: 36px; }
+  .cp-search { flex: 1; min-width: 120px; }
+  .cp-section-h h2 { font-size: 22px; }
+  .cp-mile { grid-template-columns: 52px 1fr auto; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cp * { animation: none !important; transition: none !important; }
 }
