@@ -28,6 +28,7 @@ export default function Portal({
   const editPos = (p) => openSheet({ t: "position", item: s.positions.find((x) => x.id === p.id) || p });
   const addCommit = () => openSheet({ t: "commitment" });
   const addInflow = () => openSheet({ t: "inflow" });
+  const addIncome = () => openSheet({ t: "inflow", kind: "income" });
   const editInflow = (f) => openSheet({ t: "inflow", item: f });
   const editRates = () => openSheet({ t: "rates" });
   const editOutgoing = (o) => {
@@ -81,7 +82,7 @@ export default function Portal({
       <main className="cp-main">
         {view === "Overview" && <Overview e={e} s={s} setView={setView} />}
         {view === "Positions" && <Positions e={e} s={s} edit={edit} onAdd={addPos} onEdit={editPos} />}
-        {view === "Income" && <Income e={e} s={s} edit={edit} onAddIncome={addInflow} onEditPos={editPos} onEditInflow={editInflow} />}
+        {view === "Income" && <Income e={e} s={s} edit={edit} onAddIncome={addIncome} onEditPos={editPos} onEditInflow={editInflow} />}
         {view === "Debt" && <Debt e={e} s={s} edit={edit} onEditPos={editPos} />}
         {view === "Cashflow" && <Cashflow e={e} s={s} edit={edit} onAddCommit={addCommit} onAddInflow={addInflow} onEdit={editOutgoing} />}
         {view === "Liquidity" && <Liquidity e={e} s={s} stress={stress} setStress={setStress} horizon={horizon} setHorizon={setHorizon} />}

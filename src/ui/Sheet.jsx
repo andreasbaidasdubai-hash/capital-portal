@@ -26,7 +26,7 @@ export default function Sheet({ sheet, s, close, save, saveMany, del, rates }) {
     if (sheet.item) return { ...sheet.item, tranches: sheet.item.tranches || [] };
     if (t === "position") return { id: uid(), cls: "property", unitPrice: "", livePrice: true, liquidOk: true, downAmt: "", downPct: 10, downStatus: "paid", downDate: today(), name: "", place: "", entity: "", counterparty: "", ccy: "AED", price: "", feePct: 2, feeStatus: "paid", paid: "", value: "", debt: "", rate: "", amortPct: "", payFreq: 3, mortPlanned: false, mortDate: "", mortLtv: 60, mortAmt: "", mortRate: "", mortAmortPct: "", mortFeePct: 1, rentAmt: "", rentFreq: 1, rentStart: "", occ: 95, growth: 3, completeDate: "", completeValue: "", sellPlanned: false, sellDate: "", sellGross: "", sellProb: 75, exitPct: 2, units: "", note: "", tranches: [] };
     if (t === "commitment") return { id: uid(), label: "", counterparty: "", ccy: "AED", amount: "", due: today(), status: "scheduled", series: false, every: 3, count: 4 };
-    if (t === "inflow") return { id: uid(), label: "", ccy: "CHF", amount: "", due: today(), probability: 75, status: "expected", kind: "capital", series: false, every: 1, count: 12 };
+    if (t === "inflow") return { id: uid(), label: "", ccy: "CHF", amount: "", due: today(), probability: 75, status: "expected", kind: sheet.kind || "capital", series: sheet.kind === "income", every: 1, count: 12 };
     return { ...s.fx, btcUSD: s.btcUSD };
   });
   const [gen, setGen] = useState({ open: false, count: 6, every: 3, first: today(), mode: "pct", pct: 10, amount: "" });
