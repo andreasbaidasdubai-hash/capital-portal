@@ -84,13 +84,11 @@ export function Unlock({ onGo, hasViewer }) {
   return (
     <div className="cp">
       <div className="cp-gate-wrap"><div className="cp-gate narrow">
-        <div className="brand"><LogoLockup iconSize={30} fontSize={20} /></div>
-        <h1>Locked.</h1>
-        <p className="gp">Enter your passphrase to decrypt the ledger.{hasViewer && " The view-only passphrase works here too."}</p>
-        <F l="Passphrase">
-          <input type="password" value={p} autoFocus autoComplete="current-password"
+        <div className="brand" style={{ marginBottom: 40 }}><LogoLockup iconSize={32} fontSize={22} /></div>
+        <div className="cp-fld" style={{ marginBottom: 14 }}>
+          <input type="password" value={p} autoFocus autoComplete="current-password" placeholder="Passphrase"
             onChange={(e) => setP(e.target.value)} onKeyDown={(e) => e.key === "Enter" && go()} />
-        </F>
+        </div>
         {err && <div className="cp-warn">{err}</div>}
         <button className="cp-btn primary full" disabled={busy || !p} onClick={go}>{busy ? "Decrypting…" : "Unlock"}</button>
       </div></div>
