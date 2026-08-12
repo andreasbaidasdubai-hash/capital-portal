@@ -146,7 +146,7 @@ export default function Sheet({ sheet, s, close, save, saveMany, del, rates }) {
                   <div className="cp-lbrow"><span>{Number(f.units) || 0} BTC</span><b>USD {num((Number(f.units) || 0) * (Number(s.btcUSD) || 0))}</b></div>
                   <div className="cp-lbrow note"><span>Priced {s.asOf || "—"}{s.ratesSrc ? " · " + s.ratesSrc : ""}</span></div>
                 </div>
-                <F l="Total cost basis in USD" h="What you paid in dollars for the whole holding. Leave blank if you would rather not track the gain.">
+                <F l="Initial deposit (USD)" h="What you paid in dollars for the whole holding — your cost basis. Leave blank if you would rather not track the gain.">
                   <input type="number" value={f.price} onChange={(ev) => set("price", ev.target.value)} placeholder="0" /></F>
                 {Number(f.price) > 0 && (
                   <div className="cp-tally"><span>Unrealised</span>
@@ -156,18 +156,22 @@ export default function Sheet({ sheet, s, close, save, saveMany, del, rates }) {
                 <F l="Priced in"><Chips opts={CCY_DIGITAL.map((c) => [c, c])} v={f.ccy} on={(v) => set("ccy", v)} /></F>
                 <div className="cp-two">
                   <F l="Units held"><input type="number" step="0.00000001" value={f.units} onChange={(ev) => set("units", ev.target.value)} placeholder="0.0000" /></F>
-                  <F l={f.ccy === "BTC" ? "Price per unit in BTC" : "Price per unit"}>
+                  <F l={f.ccy === "BTC" ? "Current price per unit (BTC)" : "Current price per unit"} h="Re-mark this to the latest price whenever you like.">
                     <input type="number" step={f.ccy === "BTC" ? "0.00000001" : "0.01"} value={f.unitPrice} onChange={(ev) => set("unitPrice", ev.target.value)} placeholder="0" /></F>
                 </div>
-                <F l="Total cost basis" h="What you paid for the whole holding, in the same currency.">
+                <F l="Initial deposit / cost basis" h="What you paid for the whole holding, in the same currency.">
                   <input type="number" value={f.price} onChange={(ev) => set("price", ev.target.value)} placeholder="0" /></F>
+                {Number(f.price) > 0 && (
+                  <div className="cp-tally"><span>Current value {f.ccy} {num(cryptoMv)} · unrealised</span>
+                    <b className={cryptoMv - Number(f.price) >= 0 ? "up" : "down"}>{f.ccy} {sgn(cryptoMv - Number(f.price))}<em>{pct(((cryptoMv - Number(f.price)) / Number(f.price)) * 100, 1)}</em></b></div>
+                )}
               </>)}
             </>) : f.cls === "trading" ? (<>
               <F l="Currency"><Chips opts={CCY.map((c) => [c, c])} v={f.ccy} on={(v) => set("ccy", v)} /></F>
-              <F l="Account value today" h="What the broker statement shows right now, cash and open positions together.">
-                <input type="number" value={f.value} onChange={(ev) => set("value", ev.target.value)} placeholder="0" /></F>
-              <F l="Net deposits" h="Everything you have paid in, less anything withdrawn. This is the cost basis your gain is measured against.">
+              <F l="Initial deposit" h="Everything you have paid into the account, less any withdrawals — your cost basis.">
                 <input type="number" value={f.price} onChange={(ev) => set("price", ev.target.value)} placeholder="0" /></F>
+              <F l="Current value today" h="What the account is worth now, on your latest statement. Update it whenever you want to re-mark.">
+                <input type="number" value={f.value} onChange={(ev) => set("value", ev.target.value)} placeholder="0" /></F>
               <div className="cp-tally"><span>Gain since inception</span>
                 <b className={(Number(f.value) || 0) - (Number(f.price) || 0) >= 0 ? "up" : "down"}>{f.ccy} {sgn((Number(f.value) || 0) - (Number(f.price) || 0))}{Number(f.price) > 0 && <em>{pct((((Number(f.value) || 0) - Number(f.price)) / Number(f.price)) * 100, 1)}</em>}</b></div>
               <F l="Yield or interest % p.a." h="Optional. Cash sweep or dividend yield credited monthly into the income view.">
