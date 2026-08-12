@@ -53,7 +53,24 @@ export default function Sheet({ sheet, s, close, save, saveMany, del, rates }) {
         : (f.cls === "offplan" ? Math.max((Number(f.price) || 0) - (Number(f.paid) || 0), 0) : 0))
       + (f.feeStatus === "due" ? feeAmt : 0);
   const equityLive = (Number(f.value) || 0) - (Number(f.debt) || 0) - owedLive;
-  const investedLive = (tr.length ? trPaid : Number(f.cls === "offplan" ? f.paid : f.price) || 0) + (Number(f.price) || 0) * ((Number(f.feePct) || 0) / 100);
+  // Capital deployed = own money paid in (incl. down payment), less mortgage —
+  // mirrors the engine's `invested` (paid + acqFee-paid − debt).
+  const investedLive = ((tr.length || downAmtLive)
+    ? (trPaid + downPaidLive)
+    : (f.cls === "offplan" ? (Number(f.paid) || 0) : (Number(f.price) || 0)))
+    + (CLS[f.cls]?.real ? (feeAmt - (f.feeStatus === "due" ? feeAmt : 0)) : 0)
+    - (Number(f.debt) || 0);
+  // Still owed *before* the sale — tranches dated after the sale are assumed by
+  // the buyer, so they don't reduce your proceeds (mirrors the engine's `remaining`).
+  const saleCut = f.sellPlanned && f.sellDate ? f.sellDate.slice(0, 7) : null;
+  const trDueBeforeSale = saleCut
+    ? tr.filter((x) => x.status !== "paid" && (!x.due || x.due.slice(0, 7) < saleCut)).reduce((a, x) => a + (Number(x.amount) || 0), 0)
+    : (trTotal - trPaid);
+  const remainingLive = !CLS[f.cls]?.real ? 0
+    : ((tr.length || downAmtLive)
+        ? trDueBeforeSale + (f.downStatus === "due" ? downAmtLive : 0)
+        : (f.cls === "offplan" ? Math.max((Number(f.price) || 0) - (Number(f.paid) || 0), 0) : 0))
+      + (f.feeStatus === "due" ? feeAmt : 0);
   const setTr = (id, k, v) => set("tranches", sortTranches(tr.map((x) => (x.id === id ? { ...x, [k]: v } : x))));
   const addTr = () => set("tranches", sortTranches([...tr, { id: uid(), label: `Instalment ${tr.length + 1}`, amount: "", due: addMonths(tr.length ? (tr[tr.length - 1].due || today()) : today(), 3), status: "scheduled" }]));
   const rmTr = (id) => set("tranches", tr.filter((x) => x.id !== id));
@@ -314,8 +331,9 @@ export default function Sheet({ sheet, s, close, save, saveMany, del, rates }) {
                           <Mrow l="Gross proceeds" v={`${f.ccy} ${num(sellGrossLive)}`} />
                           <Mrow l={`Selling costs ${f.exitPct || 0}%`} v={"−" + num(sellGrossLive * ((Number(f.exitPct) || 0) / 100))} tone="down" />
                           <Mrow l="Mortgage repaid" v={Number(f.debt) ? "−" + num(Number(f.debt)) : "—"} tone={Number(f.debt) ? "down" : ""} />
-                          <Mrow l="Cash you receive" v={num(sellNetLive)} strong />
-                          <Mrow l="Profit over capital deployed" v={sgn(sellNetLive - investedLive)} tone={sellNetLive - investedLive >= 0 ? "up" : "down"} strong />
+                          <Mrow l="Less still owed on contract" v={remainingLive > 0 ? "−" + num(remainingLive) : "—"} tone={remainingLive > 0 ? "down" : ""} />
+                          <Mrow l="Cash you receive" v={num(sellNetLive - remainingLive)} strong />
+                          <Mrow l="Profit over capital deployed" v={sgn((sellNetLive - remainingLive) - investedLive)} tone={(sellNetLive - remainingLive) - investedLive >= 0 ? "up" : "down"} strong />
                         </tbody></table>
                       </div>
                     )}
