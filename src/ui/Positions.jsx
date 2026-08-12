@@ -164,7 +164,7 @@ const COLS = {
   ],
   future: [
     { k: "cv", h: "Value at completion", f: (p) => (p.completeVal ? money(p.completeVal) : "—"), n: (p) => p.completeVal, total: true },
+    { k: "uplift", h: "Uplift", f: (p) => (p.completeVal ? num(Math.round(p.completeVal - p.totalCost)) : "—"), n: (p) => (p.completeVal ? p.completeVal - p.totalCost : 0), total: true, tone: (p) => (p.completeVal - p.totalCost > 0 ? "up" : "") },
     { k: "profit", h: "Profit at completion", f: (p) => (p.profitAtComp ? num(Math.round(p.profitAtComp)) : "—"), n: (p) => p.profitAtComp, total: true, tone: (p) => (p.profitAtComp > 0 ? "up" : "") },
-    { k: "mult", h: "Multiple", f: (p) => (p.invested > 0 ? p.multipleAtComp.toFixed(2) + "×" : "—"), n: (p) => (p.invested > 0 ? p.multipleAtComp : 0) },
   ],
 };

@@ -403,6 +403,8 @@
   .cp-search { flex: 1; min-width: 120px; }
   .cp-section-h h2 { font-size: 22px; }
   .cp-mile { grid-template-columns: 52px 1fr auto; }
+  /* login/passphrase screen sits higher up, not dead-centre, on phones */
+  .cp-gate-wrap { align-items: start; padding-top: 13vh; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -2,12 +2,14 @@ import React from "react";
 import { LogoLockup, Ico } from "./common.jsx";
 import Overview from "./Overview.jsx";
 import Positions from "./Positions.jsx";
+import Income from "./Income.jsx";
+import Debt from "./Debt.jsx";
 import Cashflow from "./Cashflow.jsx";
 import Liquidity from "./Liquidity.jsx";
 import Admin from "./Admin.jsx";
 import Sheet from "./Sheet.jsx";
 
-export const TABS = ["Overview", "Positions", "Cashflow", "Liquidity", "Admin"];
+export const TABS = ["Overview", "Positions", "Income", "Debt", "Cashflow", "Liquidity", "Admin"];
 
 /* The post-unlock application shell: header, tabs, view switch, footer.
    Used by App (wrapped in the vault gate) and by the seed-data preview. */
@@ -20,6 +22,7 @@ export default function Portal({
   const editPos = (p) => openSheet({ t: "position", item: s.positions.find((x) => x.id === p.id) || p });
   const addCommit = () => openSheet({ t: "commitment" });
   const addInflow = () => openSheet({ t: "inflow" });
+  const editInflow = (f) => openSheet({ t: "inflow", item: f });
   const editRates = () => openSheet({ t: "rates" });
   const editOutgoing = (o) => {
     if (o.src === "commitment" && o.raw) openSheet({ t: "commitment", item: o.raw });
@@ -65,6 +68,8 @@ export default function Portal({
       <main className="cp-main">
         {view === "Overview" && <Overview e={e} s={s} setView={setView} />}
         {view === "Positions" && <Positions e={e} s={s} edit={edit} onAdd={addPos} onEdit={editPos} />}
+        {view === "Income" && <Income e={e} s={s} edit={edit} onAddIncome={addInflow} onEditPos={editPos} onEditInflow={editInflow} />}
+        {view === "Debt" && <Debt e={e} s={s} edit={edit} onEditPos={editPos} />}
         {view === "Cashflow" && <Cashflow e={e} s={s} edit={edit} onAddCommit={addCommit} onAddInflow={addInflow} onEdit={editOutgoing} />}
         {view === "Liquidity" && <Liquidity e={e} s={s} />}
         {view === "Admin" && <Admin s={s} role={role} {...admin} onEditRates={editRates} />}

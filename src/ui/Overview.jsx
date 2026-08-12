@@ -18,7 +18,7 @@ export default function Overview({ e, s, setView }) {
   const bookProfit = e.priced.filter((p) => p.cls === "offplan").reduce((a, p) => a + p.profitAtComp, 0);
   const top = e.priced
     .filter((p) => p.cls === "offplan")
-    .map((p) => ({ name: p.name, place: p.place, equity: p.equity, profit: p.profitAtComp, mult: p.invested > 0 ? p.multipleAtComp : null }))
+    .map((p) => ({ name: p.name, place: p.place, equity: p.equity, profit: p.profitAtComp, completeVal: p.completeVal }))
     .sort((a, b) => b.profit - a.profit)
     .slice(0, 7);
 
@@ -117,14 +117,14 @@ export default function Overview({ e, s, setView }) {
           </div>
           <div className="cp-tbl-wrap">
             <table className="cp-tbl">
-              <thead><tr><th>Position</th><th className="r">Capital in</th><th className="r">Profit at completion</th><th className="r">Multiple</th></tr></thead>
+              <thead><tr><th>Position</th><th className="r">Capital in</th><th className="r">Value at completion</th><th className="r">Profit at completion</th></tr></thead>
               <tbody>
                 {top.map((p) => (
                   <tr key={p.name}>
                     <td><span className="name">{p.name}</span><div className="place">{p.place}</div></td>
                     <td className="r num">{num(p.equity)}</td>
+                    <td className="r num">{num(Math.round(p.completeVal))}</td>
                     <td className="r num up">{num(Math.round(p.profit))}</td>
-                    <td className="r mult">{p.mult != null ? p.mult.toFixed(2) + "×" : "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -139,7 +139,7 @@ export default function Overview({ e, s, setView }) {
                 </div>
                 <div className="cp-dcard-rows">
                   <div className="cp-dcard-kv"><span className="k">Capital in</span><span className="v">{num(p.equity)}</span></div>
-                  <div className="cp-dcard-kv"><span className="k">Multiple</span><span className="v">{p.mult != null ? p.mult.toFixed(2) + "×" : "—"}</span></div>
+                  <div className="cp-dcard-kv"><span className="k">At completion</span><span className="v">{num(Math.round(p.completeVal))}</span></div>
                 </div>
               </div>
             ))}
