@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { LogoLockup, Ico } from "./common.jsx";
+import Report from "./Report.jsx";
 import Overview from "./Overview.jsx";
 import Positions from "./Positions.jsx";
 import Income from "./Income.jsx";
@@ -16,8 +17,13 @@ export const TABS = ["Overview", "Positions", "Income", "Debt", "Cashflow", "Liq
 export default function Portal({
   s, e, view, setView, role, mode, setMode, setBase, lock,
   edit, err, flash, setFlash, admin,
+  stress, setStress, horizon, setHorizon,
   sheet, openSheet, closeSheet, save, saveMany, del, ratesSave,
 }) {
+  const ZERO = { delay: 0, haircut: 0, rate: 0, growth: 0 };
+  const scenarioOn = stress && (stress.delay || stress.haircut || stress.rate || stress.growth);
+  const [printing, setPrinting] = useState(false);
+  if (printing) return <Report e={e} s={s} horizon={horizon} onClose={() => setPrinting(false)} />;
   const addPos = () => openSheet({ t: "position" });
   const editPos = (p) => openSheet({ t: "position", item: s.positions.find((x) => x.id === p.id) || p });
   const addCommit = () => openSheet({ t: "commitment" });
@@ -45,6 +51,7 @@ export default function Portal({
             {role === "owner"
               ? <button className={"cp-mode" + (edit ? " live" : "")} onClick={() => setMode(edit ? "view" : "edit")}>{edit ? "Editing" : "Read only"}</button>
               : <span className="cp-mode">View only</span>}
+            <button className="cp-icon-btn" onClick={() => setPrinting(true)} title="Statement / PDF" aria-label="Statement"><Ico n="print" s={14} /></button>
             <button className="cp-icon-btn" onClick={lock} title="Lock now" aria-label="Lock now"><Ico n="shield" s={14} /></button>
           </div>
         </div>
@@ -55,6 +62,12 @@ export default function Portal({
         </nav>
       </header>
 
+      {scenarioOn ? (
+        <div style={{ background: "var(--cream)", borderBottom: "1px solid var(--cream-deep)", color: "#8A6428", fontSize: 12, padding: "8px 16px", display: "flex", justifyContent: "center", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+          <span><b>Scenario active</b> — proceeds +{stress.delay}m · marks −{stress.haircut}% · rates {stress.rate >= 0 ? "+" : "−"}{Math.abs(stress.rate)}pp · growth {stress.growth >= 0 ? "+" : "−"}{Math.abs(stress.growth)}%</span>
+          <button className="cp-btn ghost sm" onClick={() => setStress(ZERO)}>Reset</button>
+        </div>
+      ) : null}
       {err && <div style={{ background: "var(--down)", color: "#fff", fontSize: 12.5, padding: "8px 16px", textAlign: "center" }}>{err}</div>}
       {flash && (
         <div style={{ maxWidth: 1040, margin: "12px auto 0", padding: "0 24px" }}>
@@ -71,7 +84,7 @@ export default function Portal({
         {view === "Income" && <Income e={e} s={s} edit={edit} onAddIncome={addInflow} onEditPos={editPos} onEditInflow={editInflow} />}
         {view === "Debt" && <Debt e={e} s={s} edit={edit} onEditPos={editPos} />}
         {view === "Cashflow" && <Cashflow e={e} s={s} edit={edit} onAddCommit={addCommit} onAddInflow={addInflow} onEdit={editOutgoing} />}
-        {view === "Liquidity" && <Liquidity e={e} s={s} />}
+        {view === "Liquidity" && <Liquidity e={e} s={s} stress={stress} setStress={setStress} horizon={horizon} setHorizon={setHorizon} />}
         {view === "Admin" && <Admin s={s} role={role} {...admin} onEditRates={editRates} />}
       </main>
 
