@@ -14,7 +14,7 @@ import { useMemo } from "react";
 import { BLANK, CLS, CLS_ORDER } from "./constants.js";
 import { sortTranches, today, monthsBetween, grow, mKey, addMonths, num } from "./format.js";
 
-export function computeEngine(s, stress, horizon = 60) {
+export function computeEngine(s, stress, horizon = 60, caseMode = "base") {
   const fx0 = s.fx || BLANK.fx;
   const fx = { ...fx0, BTC: (Number(s.btcUSD) || 0) * (fx0.USD || 0) };
   const bx = fx[s.base] || 1;
@@ -75,7 +75,10 @@ export function computeEngine(s, stress, horizon = 60) {
     const depositPa = (p.cls === "cash" || p.cls === "trading") ? (mark * (Number(p.rate) || 0)) / 100 : 0;
     const servicePa = debt * ((Number(p.rate) || 0) / 100) + debt * ((Number(p.amortPct) || 0) / 100);
     const plannedAmt = p.mortPlanned && p.mortDate ? (p.mortAmt ? conv(p.mortAmt, p.ccy) : mark * ((Number(p.mortLtv) || 0) / 100)) : 0;
-    const completeVal = conv(p.completeValue, p.ccy);
+    // Bull case swaps in an optional optimistic completion value per position;
+    // base case (or no bull value entered) is byte-for-byte the original.
+    const completeValueSel = (caseMode === "bull" && Number(p.completeValueBull) > 0) ? Number(p.completeValueBull) : (Number(p.completeValue) || 0);
+    const completeVal = conv(completeValueSel, p.ccy);
     const grossUplift = completeVal > 0 ? completeVal - totalCost : 0;
     const g = p.cls === "cash" ? 0 : (Number(p.growth) || 0) + (stress.growth || 0);
     const t0d = today();
@@ -92,7 +95,7 @@ export function computeEngine(s, stress, horizon = 60) {
     const cashOnExit = p.cls === "cash" ? mark : salePrice - sellCosts - debt - owedAll;
     const exitProfit = p.cls === "cash" ? 0 : cashOnExit - invested;
     const exitReturn = invested > 0 ? (exitProfit / invested) * 100 : 0;
-    const compValRaw = conv(p.completeValue, p.ccy) || mark;
+    const compValRaw = conv(completeValueSel, p.ccy) || mark;
     const exitCostComp = compValRaw * ((Number(p.exitPct) || 0) / 100);
     const netAtComp = p.cls === "cash" ? mark : compValRaw - exitCostComp - debt - owedAll;
     const profitAtComp = p.cls === "cash" ? 0 : netAtComp - invested;
@@ -101,7 +104,7 @@ export function computeEngine(s, stress, horizon = 60) {
     const sellNet = sellGrossV > 0 ? sellGrossV * (1 - (Number(p.exitPct) || 0) / 100) - debt : 0;
     const sellProfit = sellGrossV > 0 ? sellNet - invested - remaining : 0;
 
-    return { ...p, isReal, tr, hasPlan, nextT, planPct, mark, price, acqFee, feePct, feeOpen, paid, invested, debt, equity, exitCost, netProceeds, unreal, roic, remaining, cancelled, owedAll, totalCost, grossUplift, compValRaw, exitCostComp, netAtComp, profitAtComp, multipleAtComp, planned, salePrice, sellCosts, cashOnExit, exitProfit, exitReturn, downPaid: conv(downPaidN, p.ccy), downDue: conv(downDueN, p.ccy), rentPa, depositPa, servicePa, netRentPa: rentPa - servicePa, plannedAmt, completeVal, growth: g, valueLater, sellGrossV, sellNet, sellProfit, yieldPct: invested > 0 ? (rentPa / invested) * 100 : 0, ltv: mark > 0 ? (debt / mark) * 100 : 0 };
+    return { ...p, isReal, tr, hasPlan, nextT, planPct, mark, price, acqFee, feePct, feeOpen, paid, invested, debt, equity, exitCost, netProceeds, unreal, roic, remaining, cancelled, owedAll, totalCost, grossUplift, compValRaw, exitCostComp, netAtComp, profitAtComp, multipleAtComp, planned, salePrice, sellCosts, cashOnExit, exitProfit, exitReturn, downPaid: conv(downPaidN, p.ccy), downDue: conv(downDueN, p.ccy), rentPa, depositPa, servicePa, netRentPa: rentPa - servicePa, plannedAmt, completeVal, completeValueSel, growth: g, valueLater, sellGrossV, sellNet, sellProfit, yieldPct: invested > 0 ? (rentPa / invested) * 100 : 0, ltv: mark > 0 ? (debt / mark) * 100 : 0 };
   });
 
   const sum = (k, f = () => true) => priced.filter(f).reduce((a, p) => a + (p[k] || 0), 0);
@@ -228,7 +231,7 @@ export function computeEngine(s, stress, horizon = 60) {
     const rentFrom = p.rentStart ? (idx[p.rentStart.slice(0, 7)] ?? (p.rentStart.slice(0, 7) < months[0] ? 0 : null)) : 0;
 
     const compIdx = p.completeDate ? idx[p.completeDate.slice(0, 7)] : null;
-    const compVal = conv(p.completeValue, p.ccy) * hc;
+    const compVal = conv(p.completeValueSel, p.ccy) * hc;
     const sellIdx = p.sellPlanned && p.sellDate ? idx[p.sellDate.slice(0, 7)] : null;
     const sellProb = (Number(p.sellProb) ?? 100) / 100;
     const explicitGross = p.sellGross ? conv(p.sellGross, p.ccy) * hc : null;
@@ -355,6 +358,6 @@ export function computeEngine(s, stress, horizon = 60) {
   };
 }
 
-export function useEngine(s, stress, horizon = 60) {
-  return useMemo(() => computeEngine(s, stress, horizon), [s, stress, horizon]);
+export function useEngine(s, stress, horizon = 60, caseMode = "base") {
+  return useMemo(() => computeEngine(s, stress, horizon, caseMode), [s, stress, horizon, caseMode]);
 }

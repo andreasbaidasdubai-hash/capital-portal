@@ -17,13 +17,14 @@ export const TABS = ["Overview", "Positions", "Income", "Debt", "Cashflow", "Liq
 export default function Portal({
   s, e, view, setView, role, mode, setMode, setBase, lock,
   edit, err, flash, setFlash, admin,
-  stress, setStress, horizon, setHorizon,
+  stress, setStress, horizon, setHorizon, caseMode, setCaseMode,
   sheet, openSheet, closeSheet, save, saveMany, del, ratesSave,
 }) {
   const ZERO = { delay: 0, haircut: 0, rate: 0, growth: 0 };
   const scenarioOn = stress && (stress.delay || stress.haircut || stress.rate || stress.growth);
+  const bull = caseMode === "bull";
   const [printing, setPrinting] = useState(false);
-  if (printing) return <Report e={e} s={s} horizon={horizon} onClose={() => setPrinting(false)} />;
+  if (printing) return <Report e={e} s={s} horizon={horizon} caseMode={caseMode} onClose={() => setPrinting(false)} />;
   const addPos = () => openSheet({ t: "position" });
   const editPos = (p) => openSheet({ t: "position", item: s.positions.find((x) => x.id === p.id) || p });
   const addCommit = () => openSheet({ t: "commitment" });
@@ -49,6 +50,12 @@ export default function Portal({
                   onClick={() => setBase(c)}>{c}</button>
               ))}
             </div>
+            <div className={"cp-pill cp-casepill" + (bull ? " bull" : "")} role="group" aria-label="Value case" title="Switch between your base estimates and a bull case">
+              {[["base", "Base"], ["bull", "Bull"]].map(([k, l]) => (
+                <button key={k} className={"cp-pill-b" + (caseMode === k ? " on" : "")} aria-pressed={caseMode === k}
+                  onClick={() => setCaseMode(k)}>{l}</button>
+              ))}
+            </div>
             {role === "owner"
               ? <button className={"cp-mode" + (edit ? " live" : "")} onClick={() => setMode(edit ? "view" : "edit")}>{edit ? "Editing" : "Read only"}</button>
               : <span className="cp-mode">View only</span>}
@@ -67,6 +74,12 @@ export default function Portal({
         <div style={{ background: "var(--cream)", borderBottom: "1px solid var(--cream-deep)", color: "#8A6428", fontSize: 12, padding: "8px 16px", display: "flex", justifyContent: "center", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
           <span><b>Scenario active</b> — proceeds +{stress.delay}m · marks −{stress.haircut}% · rates {stress.rate >= 0 ? "+" : "−"}{Math.abs(stress.rate)}pp · growth {stress.growth >= 0 ? "+" : "−"}{Math.abs(stress.growth)}%</span>
           <button className="cp-btn ghost sm" onClick={() => setStress(ZERO)}>Reset</button>
+        </div>
+      ) : null}
+      {bull ? (
+        <div style={{ background: "rgba(47,122,100,0.10)", borderBottom: "1px solid rgba(47,122,100,0.25)", color: "var(--up)", fontSize: 12, padding: "8px 16px", display: "flex", justifyContent: "center", alignItems: "center", gap: 14 }}>
+          <span><b>Bull case</b> — figures use your optimistic completion values where set; positions without one keep their base estimate.</span>
+          <button className="cp-btn ghost sm" onClick={() => setCaseMode("base")}>Back to base</button>
         </div>
       ) : null}
       {err && <div style={{ background: "var(--down)", color: "#fff", fontSize: 12.5, padding: "8px 16px", textAlign: "center" }}>{err}</div>}

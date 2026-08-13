@@ -5,7 +5,7 @@ import { LogoLockup, Ico } from "./common.jsx";
 const mDate = (key) => { const [y, m] = key.split("-"); return `${MON[Number(m) - 1]} ${y.slice(2)}`; };
 const CLEAN = (s) => s.replace(/ — (realised|completes)$/, "");
 
-export default function Report({ e, s, horizon, onClose }) {
+export default function Report({ e, s, horizon, caseMode, onClose }) {
   const ccy = s.base;
   const bookProfit = e.priced.filter((p) => p.cls === "offplan").reduce((a, p) => a + p.profitAtComp, 0);
   const allocTotal = e.byClass.reduce((a, [, v]) => a + v, 0) || 1;
@@ -27,7 +27,7 @@ export default function Report({ e, s, horizon, onClose }) {
         <header className="cp-rep-head">
           <LogoLockup iconSize={30} fontSize={20} />
           <div className="cp-rep-meta">
-            <div>Capital statement</div>
+            <div>Capital statement{caseMode === "bull" ? " · Bull case" : ""}</div>
             <div className="dim">As of {s.asOf || today} · base {ccy}</div>
             <div className="dim">Private &amp; confidential</div>
           </div>

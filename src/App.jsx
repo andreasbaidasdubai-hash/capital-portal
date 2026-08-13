@@ -23,6 +23,7 @@ export default function App() {
   const [sheet, setSheet] = useState(null);
   const [stress, setStress] = useState(ZERO);
   const [horizon, setHorizon] = useState(60);
+  const [caseMode, setCaseMode] = useState("base");
 
   const [vault, setVault] = useState(null);
   const [gate, setGate] = useState("boot"); // boot | setup | unlock | open
@@ -150,7 +151,7 @@ export default function App() {
     }));
   }, [gate, role, s.feesMigrated, up]);
 
-  const e = useEngine(s, stress, horizon);
+  const e = useEngine(s, stress, horizon, caseMode);
   const edit = mode === "edit" && role === "owner";
 
   const upsert = (b, item) => up((c) => {
@@ -175,6 +176,7 @@ export default function App() {
       s={s} e={e} view={view} setView={setView} role={role} mode={mode} setMode={setMode}
       setBase={(c) => up((x) => ({ ...x, base: c }))} lock={lock} edit={edit}
       stress={stress} setStress={setStress} horizon={horizon} setHorizon={setHorizon}
+      caseMode={caseMode} setCaseMode={setCaseMode}
       err={err} flash={flash} setFlash={setFlash}
       sheet={sheet} openSheet={setSheet} closeSheet={() => setSheet(null)}
       save={(b, i) => { upsert(b, i); setSheet(null); }}

@@ -24,7 +24,7 @@ export default function Sheet({ sheet, s, close, save, saveMany, del, rates }) {
   const t = sheet.t;
   const [f, setF] = useState(() => {
     if (sheet.item) return { ...sheet.item, tranches: sheet.item.tranches || [] };
-    if (t === "position") return { id: uid(), cls: "property", unitPrice: "", livePrice: true, liquidOk: true, downAmt: "", downPct: 10, downStatus: "paid", downDate: today(), name: "", place: "", entity: "", counterparty: "", ccy: "AED", price: "", feePct: 2, feeStatus: "paid", paid: "", value: "", debt: "", rate: "", amortPct: "", payFreq: 3, mortPlanned: false, mortDate: "", mortLtv: 60, mortAmt: "", mortRate: "", mortAmortPct: "", mortFeePct: 1, rentAmt: "", rentFreq: 1, rentStart: "", occ: 95, growth: 3, completeDate: "", completeValue: "", sellPlanned: false, sellDate: "", sellGross: "", sellProb: 75, exitPct: 2, units: "", note: "", tranches: [] };
+    if (t === "position") return { id: uid(), cls: "property", unitPrice: "", livePrice: true, liquidOk: true, downAmt: "", downPct: 10, downStatus: "paid", downDate: today(), name: "", place: "", entity: "", counterparty: "", ccy: "AED", price: "", feePct: 2, feeStatus: "paid", paid: "", value: "", debt: "", rate: "", amortPct: "", payFreq: 3, mortPlanned: false, mortDate: "", mortLtv: 60, mortAmt: "", mortRate: "", mortAmortPct: "", mortFeePct: 1, rentAmt: "", rentFreq: 1, rentStart: "", occ: 95, growth: 3, completeDate: "", completeValue: "", completeValueBull: "", sellPlanned: false, sellDate: "", sellGross: "", sellProb: 75, exitPct: 2, units: "", note: "", tranches: [] };
     if (t === "commitment") return { id: uid(), label: "", counterparty: "", ccy: "AED", amount: "", due: today(), status: "scheduled", series: false, every: 3, count: 4 };
     if (t === "inflow") return { id: uid(), label: "", ccy: "CHF", amount: "", due: today(), probability: 75, status: "expected", kind: sheet.kind || "capital", series: sheet.kind === "income", every: 1, count: 12 };
     return { ...s.fx, btcUSD: s.btcUSD };
@@ -334,6 +334,11 @@ export default function Sheet({ sheet, s, close, save, saveMany, del, rates }) {
                     <F l="Estimated value on completion" h="What you expect it to be worth once finished. The timeline steps the mark up on that date."><input type="number" value={f.completeValue} onChange={(ev) => set("completeValue", ev.target.value)} placeholder="0" /></F>
                     {Number(f.completeValue) > 0 && Number(f.price) > 0 && (
                       <div className="cp-tally"><span>Uplift over contract price</span><b className={Number(f.completeValue) >= Number(f.price) ? "up" : "down"}>{f.ccy} {sgn(Number(f.completeValue) - Number(f.price))}</b></div>
+                    )}
+                    <F l="Bull-case value on completion" h="Optional. Your optimistic estimate. Flip the Base / Bull switch in the header to see the whole portfolio, charts and projections on these figures.">
+                      <input type="number" value={f.completeValueBull} onChange={(ev) => set("completeValueBull", ev.target.value)} placeholder="— leave blank to keep base" /></F>
+                    {Number(f.completeValueBull) > 0 && Number(f.completeValue) > 0 && (
+                      <div className="cp-tally"><span>Bull upside over base</span><b className={Number(f.completeValueBull) >= Number(f.completeValue) ? "up" : "down"}>{f.ccy} {sgn(Number(f.completeValueBull) - Number(f.completeValue))}</b></div>
                     )}
                     <F l="Do you plan to sell or realise it?">
                       <button type="button" className={"cp-chip-wide" + (f.sellPlanned ? " on" : "")} onClick={() => set("sellPlanned", !f.sellPlanned)}>{f.sellPlanned ? "Yes — proceeds land on the timeline" : "Hold, no sale planned"}</button></F>

@@ -19,7 +19,8 @@ function Preview() {
   const [sheet, setSheet] = useState(null);
   const [stress, setStress] = useState(ZERO);
   const [horizon, setHorizon] = useState(60);
-  const e = computeEngine(s, stress, horizon);
+  const [caseMode, setCaseMode] = useState("base");
+  const e = computeEngine(s, stress, horizon, caseMode);
   const noop = () => setFlash("Preview mode — vault actions are disabled here.");
 
   const upsert = (b, item) => setS((c) => {
@@ -34,6 +35,7 @@ function Preview() {
       s={s} e={e} view={view} setView={setView} role="owner" mode={mode} setMode={setMode}
       setBase={(c) => setS((x) => ({ ...x, base: c }))} lock={noop} edit={mode === "edit"}
       stress={stress} setStress={setStress} horizon={horizon} setHorizon={setHorizon}
+      caseMode={caseMode} setCaseMode={setCaseMode}
       err="" flash={flash} setFlash={setFlash}
       sheet={sheet} openSheet={setSheet} closeSheet={() => setSheet(null)}
       save={(b, i) => { upsert(b, i); setSheet(null); }}
