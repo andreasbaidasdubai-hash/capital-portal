@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { num, compact, MON } from "../engine/format.js";
-import { today } from "../engine/format.js";
+import { today, addMonths } from "../engine/format.js";
 
 const mDate = (key) => { const [y, m] = key.split("-"); return `${MON[Number(m) - 1]} ${y.slice(2)}`; };
 const shortDay = (iso) => (iso ? `${MON[Number(iso.slice(5, 7)) - 1]} ${iso.slice(8, 10)}, ${iso.slice(2, 4)}` : "—");
@@ -8,10 +8,12 @@ const cleanLabel = (s) => s.replace(/ — (realised|completes)$/, "");
 
 export default function Cashflow({ e, s, edit, onAddCommit, onAddInflow, onEdit }) {
   const [tab, setTab] = useState("out");
+  const [range, setRange] = useState("12m");
   const t0 = today();
+  const cut12 = addMonths(t0, 12);
   const out = e.outgoings
-    .filter((o) => o.status !== "paid" && o.status !== "settled" && o.due && o.due >= t0)
-    .slice(0, 24);
+    .filter((o) => o.status !== "paid" && o.status !== "settled" && o.due && o.due >= t0 && (range === "all" || o.due < cut12))
+    .slice(0, range === "12m" ? 40 : 120);
   const sells = e.events.filter((ev) => ev.kind === "sell");
 
   return (
@@ -38,7 +40,13 @@ export default function Cashflow({ e, s, edit, onAddCommit, onAddInflow, onEdit 
 
       {tab === "out" && (
         <section className="cp-section">
-          <div className="cp-section-h"><h2>Scheduled outgoings</h2><span className="note">unpaid instalments, down payments, costs &amp; commitments</span></div>
+          <div className="cp-section-h">
+            <h2>Scheduled outgoings</h2>
+            <div className="cp-lens">
+              <button className={range === "12m" ? "on" : ""} onClick={() => setRange("12m")}>Next 12 months</button>
+              <button className={range === "all" ? "on" : ""} onClick={() => setRange("all")}>All upcoming</button>
+            </div>
+          </div>
           <div className="cp-tbl-wrap">
             <table className="cp-tbl">
               <thead><tr><th>Due</th><th>Item</th><th>Counterparty</th><th className="r">Amount</th></tr></thead>
