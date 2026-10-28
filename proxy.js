@@ -1,40 +1,23 @@
 /* ── Edge access gate ───────────────────────────────────────────────
    Runs on every request before anything is served. The portal (and all
    of its static files) stay invisible until the visitor authenticates
-   with HTTP Basic Auth against the owner credentials.
+   with HTTP Basic Auth.
 
-   Credentials live ONLY in Vercel environment variables, never in code:
-     PORTAL_USER   – the login name
-     PORTAL_PASS   – the login password
-   Set both in the capital-portal Vercel project (Production), then
-   redeploy. Until they are set, the gate fails CLOSED (nobody gets in).
+   NOTE on credentials: Vercel Routing Middleware does NOT receive custom
+   project environment variables at runtime (only system VERCEL_* vars),
+   so the login is kept here in code. This repository is PRIVATE, so only
+   the owner can read it. To change the login, edit the two constants
+   below and redeploy (git push).
 
    This gate is additive: it does not touch the encrypted vault, the
    engine, or any stored data. It only decides who may load the app. */
 
 import { next } from "@vercel/functions";
 
+const PORTAL_USER = "andreas";
+const PORTAL_PASS = "e6fd94cf2ad0a2a8d1ad594a";
+
 export default function proxy(request) {
-  const USER = process.env.PORTAL_USER;
-  const PASS = process.env.PORTAL_PASS;
-
-  // Fail closed: no credentials configured → let nobody in.
-  if (!USER || !PASS) {
-    // TEMP DIAGNOSTIC (names/counts only — never values): remove after debugging.
-    let dbg = "";
-    try {
-      const keys = Object.keys(process.env || {});
-      const portalKeys = keys.filter((k) => k.indexOf("PORTAL") !== -1);
-      dbg = ` [diag hasUser=${!!USER} hasPass=${!!PASS} portalKeys=${portalKeys.join("|") || "none"} envCount=${keys.length}]`;
-    } catch (e) {
-      dbg = " [diag process.env threw: " + (e && e.message) + "]";
-    }
-    return new Response(
-      "Portal access is not configured. Set PORTAL_USER and PORTAL_PASS in the Vercel project settings, then redeploy." + dbg,
-      { status: 503, headers: { "Cache-Control": "no-store" } }
-    );
-  }
-
   const header = request.headers.get("authorization") || "";
   if (header.startsWith("Basic ")) {
     let decoded = "";
@@ -44,12 +27,12 @@ export default function proxy(request) {
       decoded = "";
     }
     const idx = decoded.indexOf(":");
-    if (idx !== -1) {
-      const u = decoded.slice(0, idx);
-      const p = decoded.slice(idx + 1);
-      if (timingSafeEqual(u, USER) && timingSafeEqual(p, PASS)) {
-        return next(); // authenticated → serve the portal
-      }
+    if (
+      idx !== -1 &&
+      timingSafeEqual(decoded.slice(0, idx), PORTAL_USER) &&
+      timingSafeEqual(decoded.slice(idx + 1), PORTAL_PASS)
+    ) {
+      return next(); // authenticated → serve the portal
     }
   }
 
