@@ -26,3 +26,6 @@ dist-ssr
 # scratch
 _dump.mjs
 *.local
+
+.vercel
+.env*

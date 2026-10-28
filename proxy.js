@@ -20,8 +20,17 @@ export default function proxy(request) {
 
   // Fail closed: no credentials configured → let nobody in.
   if (!USER || !PASS) {
+    // TEMP DIAGNOSTIC (names/counts only — never values): remove after debugging.
+    let dbg = "";
+    try {
+      const keys = Object.keys(process.env || {});
+      const portalKeys = keys.filter((k) => k.indexOf("PORTAL") !== -1);
+      dbg = ` [diag hasUser=${!!USER} hasPass=${!!PASS} portalKeys=${portalKeys.join("|") || "none"} envCount=${keys.length}]`;
+    } catch (e) {
+      dbg = " [diag process.env threw: " + (e && e.message) + "]";
+    }
     return new Response(
-      "Portal access is not configured. Set PORTAL_USER and PORTAL_PASS in the Vercel project settings, then redeploy.",
+      "Portal access is not configured. Set PORTAL_USER and PORTAL_PASS in the Vercel project settings, then redeploy." + dbg,
       { status: 503, headers: { "Cache-Control": "no-store" } }
     );
   }
